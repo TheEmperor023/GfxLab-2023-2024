@@ -53,8 +53,14 @@ public class Pathtracer extends Raytracer {
 			Color rI = rO.mul(bsdfResult.color());
 			result = result.add(rI);
 		}
-		
+
 		return result;
+		//return addFog(result, ray.p().length(), ray.at(0), ray.d(),0.1,0.01);
 	}
-	
+
+	private Color addFog(Color inColor, double t, Vec3 o, Vec3 d, double a, double b){
+		double fogAmount = ((a/b) * Math.pow(Math.E, -1 * o.y() * b) * (1.0 - Math.pow(Math.E, -t * d.y() * b))/d.y());
+		Color fogColor = Color.WHITE;
+		return inColor.add(fogColor.mul(fogAmount));
+	}
 }

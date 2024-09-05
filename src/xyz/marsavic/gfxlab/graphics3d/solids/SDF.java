@@ -1,5 +1,7 @@
 package xyz.marsavic.gfxlab.graphics3d.solids;
 
+import xyz.marsavic.functions.F1;
+import xyz.marsavic.geometry.Vec;
 import xyz.marsavic.geometry.Vector;
 import xyz.marsavic.gfxlab.Color;
 import xyz.marsavic.gfxlab.Vec3;
@@ -7,15 +9,20 @@ import xyz.marsavic.gfxlab.graphics3d.Hit;
 import xyz.marsavic.gfxlab.graphics3d.Material;
 import xyz.marsavic.gfxlab.graphics3d.Ray;
 import xyz.marsavic.gfxlab.graphics3d.Solid;
+import xyz.marsavic.random.RNG;
 import xyz.marsavic.utils.Numeric;
+
+import java.util.Random;
 
 public interface SDF extends Solid {
 
 	double dist(Vec3 p);
-	
+
+
 	
 	double DELTA_HIT = 1e-4;
 	int MAX_STEPS = 32;
+
 	
 	@Override
 	default Hit firstHit(Ray ray, double afterTime) {
@@ -97,4 +104,56 @@ public interface SDF extends Solid {
 			return da * k + db * (1 - k) - k * (1 - k) * r;
 		};
 	}
+	static SDF suptraction(SDF a, SDF b) {return p -> Math.max(a.dist(p) * -1, b.dist(p));}
+	static SDF torus(Vec3 pe, Vector t){
+		return p -> {
+			Vector q = Vector.xy(Vector.xy(pe.x(),pe.z()).length() - t.x(), p.y());
+			return q.length() - t.y();
+		};
+	}
+
+	static SDF cylinder(Vec3 c, double h, double r){
+		return p -> {
+			Vector d = Vector.xy(Vector.xy(c.x(), c.z()).length(), p.y()).abs().sub(Vector.xy(r,h));
+			return Math.min(Math.max(d.x(),d.x()), 0.0) + Math.max(d.length(), 0.0);
+		};
+	}
+
+	static SDF sdPlane(Vec3 n, double h ){
+		return p -> {
+			return p.dot(n) - h;
+		};
+	}
+
+	static SDF CenterCross(){
+		SDF cross = union(union(box(Vec3.xyz(Double.POSITIVE_INFINITY,1,1)), box(Vec3.xyz(1, Double.POSITIVE_INFINITY,1))), box(Vec3.xyz(1,1,Double.POSITIVE_INFINITY)));
+		return p -> {
+			return cross.dist(p);
+		};
+	}
+
+
+
+	static SDF sponge(SDF sdf,int iter){return p -> {
+		double d = sdf.dist(p);
+
+		double s = 1.0;
+		for( int m = 0; m < iter ; m++ )
+		{
+			Vec3 a = Vec3.xyz(Numeric.mod((p.x() * s), 2.0) - 1.0,Numeric.mod((p.y() * s), 2.0) - 1.0,Numeric.mod((p.z() * s), 2.0) - 1.0);
+			s *= 3.0;
+			Vec3 w = Vec3.xyz(Math.abs(1.0 - 3 * Math.abs(a.x())),Math.abs(1.0 - 3 * Math.abs(a.y())),Math.abs(1.0 - 3 * Math.abs(a.z())));
+
+			double da = Math.max(w.x(),w.y());
+			double db = Math.max(w.y(),w.z());
+			double dc = Math.max(w.z(),w.x());
+			double c = (Math.min(da, Math.min(db,dc))-1.0) / s;
+
+			d = Math.max(d,c);
+		}
+
+		return d;
+	};
+	}
+
 }

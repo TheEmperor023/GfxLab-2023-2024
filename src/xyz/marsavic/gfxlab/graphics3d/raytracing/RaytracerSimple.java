@@ -3,11 +3,13 @@ package xyz.marsavic.gfxlab.graphics3d.raytracing;
 import xyz.marsavic.gfxlab.Color;
 import xyz.marsavic.gfxlab.Vec3;
 import xyz.marsavic.gfxlab.graphics3d.*;
+import xyz.marsavic.utils.Numeric;
 
 
 public class RaytracerSimple extends Raytracer {
 	
 	private final static double EPSILON = 1e-9;
+	private final double DELTA_HIT = 1e-3;
 	
 	public RaytracerSimple(Scene scene, Camera camera) {
 		super(scene, camera);
@@ -36,7 +38,7 @@ public class RaytracerSimple extends Raytracer {
 		
 		Material material = hit.material();
 		
-		Color lightDiffuse  = Color.BLACK;          // The sum of diffuse contributions from all the lights
+		Color lightDiffuse  = Color.gray(0.1);          // The sum of diffuse contributions from all the lights
 		Color lightSpecular = Color.BLACK;
 		
 		for (Light light : scene.lights()) {
@@ -45,7 +47,13 @@ public class RaytracerSimple extends Raytracer {
 //			if (scene.solid().hitBetween(rayToLight, EPSILON, 1)) {
 //				continue;
 //			}
-			
+			Vec3 rl = p.sub(light.p()); // Vector from light to p
+			Ray lightToRay = Ray.pd(light.p(), rl);
+			if(scene.solid().hitBetween(lightToRay, 0, 1 - DELTA_HIT)){
+				continue;
+			}
+
+
 			double lLSqr = l.lengthSquared();       // Distance from p to the light squared
 			double lL = Math.sqrt(lLSqr);           // Distance from p to the light
 			double cosLN = n_.dot(l) / lL;          // Cosine of the angle between l and n_
@@ -79,7 +87,14 @@ public class RaytracerSimple extends Raytracer {
 			Color lightRefracted = sample(Ray.pd(p, f), depthRemaining - 1);
 			result = result.add(lightRefracted).mul(material.refractive());
 		}
-		
+
 		return result;
+		//return addFog(result, ray.p().length(), ray.at(0), ray.d(),0.1,0.01);
+	}
+
+	private Color addFog(Color inColor, double t, Vec3 o, Vec3 d, double a, double b){
+		double fogAmount = ((a/b) * Math.pow(Math.E, -1 * o.y() * b) * (1.0 - Math.pow(Math.E, -t * d.y() * b))/d.y());
+		Color fogColor = Color.WHITE;
+		return inColor.add(fogColor.mul(fogAmount));
 	}
 }

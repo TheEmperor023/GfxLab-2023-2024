@@ -40,18 +40,18 @@ public class GfxLab {
 														)
 												)
 										),
-/*
-										e(Pathtracer::new,
-												e(ChristmasTree::new),
-												e(TransformedCamera::new,
-													e(Perspective::new, e(0.5)),
-													e(Affine.IDENTITY
-															.then(Affine.rotationAboutX(0))
-															.then(Affine.translation(Vec3.xyz(0, 8, -28)))
-													)
-												)
-										),
-*/
+
+//										e(Pathtracer::new,
+//												e(ChristmasTree::new),
+//												e(TransformedCamera::new,
+//													e(Perspective::new, e(0.5)),
+//													e(Affine.IDENTITY
+//															.then(Affine.rotationAboutX(0))
+//															.then(Affine.translation(Vec3.xyz(0, 8, -28)))
+//													)
+//												)
+//										),
+
 										e(TransformationsFromSize.toGeometric, eSize)
 								),
 								eSize,
