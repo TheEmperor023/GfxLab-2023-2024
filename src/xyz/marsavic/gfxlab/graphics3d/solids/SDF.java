@@ -81,7 +81,7 @@ public interface SDF extends Solid {
 		
 		@Override
 		public Material material() {
-			return Material.matte(Color.hsb(0.6, 0.7, 1.0)).specular(Color.WHITE).shininess(32);
+			return Material.matte(Color.hsb(0.31, 1, 1)).specular(Color.WHITE).shininess(62);
 		}
 		
 		@Override
@@ -105,9 +105,9 @@ public interface SDF extends Solid {
 		};
 	}
 	static SDF suptraction(SDF a, SDF b) {return p -> Math.max(a.dist(p) * -1, b.dist(p));}
-	static SDF torus(Vec3 pe, Vector t){
+	static SDF torus(Vec3 t){
 		return p -> {
-			Vector q = Vector.xy(Vector.xy(pe.x(),pe.z()).length() - t.x(), p.y());
+			Vector q = Vector.xy(Vector.xy(p.x(),p.z()).length() - t.x(), p.y());
 			return q.length() - t.y();
 		};
 	}

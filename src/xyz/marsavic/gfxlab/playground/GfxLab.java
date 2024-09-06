@@ -10,6 +10,7 @@ import xyz.marsavic.gfxlab.graphics3d.cameras.ThinLensFOV;
 import xyz.marsavic.gfxlab.graphics3d.cameras.TransformedCamera;
 import xyz.marsavic.gfxlab.graphics3d.raytracing.Pathtracer;
 import xyz.marsavic.gfxlab.graphics3d.raytracing.RaytracerSimple;
+import xyz.marsavic.gfxlab.graphics3d.raytracing.RaytracerSimpleSDF;
 import xyz.marsavic.gfxlab.graphics3d.scenes.*;
 import xyz.marsavic.gfxlab.gui.UtilsGL;
 import xyz.marsavic.gfxlab.tonemapping.ColorTransform;
@@ -31,8 +32,8 @@ public class GfxLab {
 				e(Fs::frFrameToneMapping,
 						new EAggregator(
 								e(Fs::transformedColorFunction,
-										e(RaytracerSimple::new, // Shadows are currently turned off to simplify rendering of SDF solids.
-												e(TestSDF::new),
+										e(RaytracerSimpleSDF::new, // Shadows are currently turned off to simplify rendering of SDF solids.
+												e(Sponges::new),
 												e(TransformedCamera::new,
 														e(Perspective::new, e(0.5)),
 														e(Affine.IDENTITY

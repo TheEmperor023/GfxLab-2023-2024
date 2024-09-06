@@ -44,14 +44,10 @@ public class RaytracerSimple extends Raytracer {
 		for (Light light : scene.lights()) {
 			Vec3 l = light.p().sub(p);              // Vector from p to the light;
 			Ray rayToLight = Ray.pd(p, l);
-//			if (scene.solid().hitBetween(rayToLight, EPSILON, 1)) {
-//				continue;
-//			}
-			Vec3 rl = p.sub(light.p()); // Vector from light to p
-			Ray lightToRay = Ray.pd(light.p(), rl);
-			if(scene.solid().hitBetween(lightToRay, 0, 1 - DELTA_HIT)){
+			if (scene.solid().hitBetween(rayToLight, EPSILON, 1)) {
 				continue;
 			}
+
 
 
 			double lLSqr = l.lengthSquared();       // Distance from p to the light squared
@@ -89,7 +85,6 @@ public class RaytracerSimple extends Raytracer {
 		}
 
 		return result;
-		//return addFog(result, ray.p().length(), ray.at(0), ray.d(),0.1,0.01);
 	}
 
 	private Color addFog(Color inColor, double t, Vec3 o, Vec3 d, double a, double b){
